@@ -1,7 +1,7 @@
 __pycache__/
-myio/__pycache__/
-particles/__pycache__/
-physics/__pycache__/
-utils/__pycache__/
+lagrlib/myio/__pycache__/
+lagrlib/particles/__pycache__/
+lagrlib/physics/__pycache__/
+lagrlib/utils/__pycache__/
 results/
 testing.py
