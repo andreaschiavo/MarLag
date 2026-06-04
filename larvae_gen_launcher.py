@@ -13,7 +13,7 @@ data = {
     "depth margins" : (0,300),
     "depth range min": 20,
     "depth range max": 250,
-    "total particles" : 1000000,
+    "total particles" : 100000,
     "PLD": 54,
     "PLD var": 5,
     "spawning season median" : {"17": [[1, 15], [6, 9]], "18": [[12, 22], [8, 6]]}, # original [[2,5], [6,30]] - [[1,12], [8,27]]

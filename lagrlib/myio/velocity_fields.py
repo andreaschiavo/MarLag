@@ -115,7 +115,7 @@ class FieldsManager(object):
 
                 if self.vertical_adv:
                     path_vovecrtz = sorted(glob(f"{path}medsea-cmip5-projections-physics-RCP{self.RCP:02d}-{year:04d}-{month:02d}-*/vovecrtz_medsea-cmip5-projections-physics_RCP{self.RCP:2d}_grid_W.nc"))
-                    ds_vove = xr.open_dataset(path_vovecrtz).sel(lon = slice(left, right), lat = slice(bottom, top), depth = slice(D_min, D_max)).fillna(0)
+                    ds_vove = xr.open_mfdataset(path_vovecrtz, combine = "nested", concat_dim="time").sel(lon = slice(left, right), lat = slice(bottom, top), depth = slice(D_min, D_max)).fillna(0)
                     
                     ds_vove = ds_vove * (SEC2DAY) if backward else ds_vove * (SEC2DAY) *-1
                     
