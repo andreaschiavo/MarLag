@@ -36,7 +36,7 @@ MarLag/
 └──larvae_gen_launcher.py         # Execution script to launch particles/larvae generation
 ```
 # Key features
-1. NumPy Vectorization: Particle state (coordinate X, Y, Z, age) is managed through flattened NumPy arrays. Deaths, strandings, and releases are vectorised, avoiding for cycles.
+1. NumPy Vectorisation: Particle state (coordinate X, Y, Z, age) is managed through flattened NumPy arrays. Deaths, strandings, and releases are vectorised, avoiding for cycles.
 2. Adaptive SciPy integration: scipy.integrate.solve_ivp resolves the displacement of particles allowing adaptive time-steps.
 3. Advanced larval biology: individual variability of Pelagic Larval Duration (PLD) and spawning timing are modelled through tailored funcitons. Real-time monitoring of larval age.
 4. Forward and backward tracking: supports both forward dispersion simulations (larval connectivity) and backward trajectory tracking to locate spawning origins.
@@ -62,11 +62,11 @@ The library was tested on Python v3.13.5
 ## What is a Lagrangian Simulation?
 Instead of observing ocean currents from fixed locations (Eulerian approach), a Lagrangian simulation tracks individual particles (e.g., larvae) as independent agents. Each particle's 3D position $(x, y, z)$ is integrated over time, incorporating currents (advection), turbulence (diffusion), and active biological behaviors.
 ## Spatial Grid
-To initiate tracking, MarLag discretizes marine spawning habitats using a regular grid of square or rectangular cells ($\Delta \phi \times \Delta \lambda$). This grid serves two key purposes:
+To initiate tracking, MarLag discretises marine spawning habitats using a regular grid of square or rectangular cells. This grid serves two key purposes:
 - Discretisation of spawning limit: each cell represents a localised spawning source that releases a specific cohort of particles on designated days.
 - Model Alignment: a structured grid aligns particle initialisation with gridded hydrodynamic datasets (CMEMS, POLCOMS, CMCC), preventing accidental land generation.
 ## Run the script
-```larvae_gen_launcher.py``` and ```lagrangian_launcher.py``` ar the two executing script to generate larvae and launch the proper particle tracking simulation. Each script contains an example of options file (.json) that is needed to build the objcets and start the simulaitons.
+```larvae_gen_launcher.py``` and ```lagrangian_launcher.py``` are the two executing script to generate larvae and launch the particle tracking simulation. Each script contains an example of options file (.json) that is needed to build the objects and start the simulations.
 ### Options file
 ```
 {
