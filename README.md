@@ -1,4 +1,5 @@
 # MarLag project: Marine Lagrangian Simulation Engine
+# ALPHA VERSION - DEBUG PRINTS ACTIVE
 
 **MarLag** is a high-performance, vectorized Python library designed for 3D/2D Lagrangian particle tracking and larval connectivity modeling in marine environments.
 By leveraging **SciPy's adaptive ODE solvers (`solve_ivp`)** and **NumPy vectorization**, MarLag tracks floating particles (e.g., fish or invertebrate larvae) subjected to ocean currents, horizontal diffusion, and biological behavioral constraints.
