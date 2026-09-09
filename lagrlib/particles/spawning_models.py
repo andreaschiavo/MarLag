@@ -82,7 +82,7 @@ class HKE_17_18_19(SpawningModels):
             # md = [month, day]
             year = 2020 if leap else 2021
             if backward:
-                doy = (date(year, medianday[0], medianday[1]) + relativedelta(days=self.data["PLD"])).timetuple().tm_yday
+                doy = (date(year, medianday[0], medianday[1]) + relativedelta(days=self.PLD)).timetuple().tm_yday
             else:
                 doy = date(year, medianday[0], medianday[1]).timetuple().tm_yday
             return doy

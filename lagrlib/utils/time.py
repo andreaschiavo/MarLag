@@ -62,9 +62,10 @@ class Calendar(object):
             return True
         return False
     
-    def is_new_month(self):
-        if self.today.month != self.current_month:
-            self.current_month = self.today.month
+    def is_new_month(self, date = None):
+        date = date if date is not None else self.today
+        if date.month != self.current_month:
+            self.current_month = date.month
             return True
         return False
     

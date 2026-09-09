@@ -47,7 +47,7 @@ class Lagrangian:
         diff_dt = config.get("diffusion dt", 86400) if config else 86400
         day_depth = config.get("day depth", 100) if config else 100
         night_depth = config.get("night depth", 5) if config else 5
-        dvm_speed = config.get("dvm speed", 1.0) if config else 1.0
+        dvm_speed = config.get("dvm speed", 10.0) if config else 10.0 # tasso di rilassamento 1/giorno: sotto ~10 la DVM non raggiunge le quote target
         
         self.velocity_fields = FieldsManager(ds, model = model, RCP = RCP, vertical_adv = vertical_adv)
         
@@ -83,14 +83,16 @@ class Lagrangian:
             self.calendar.today = self.calendar.get_today(d, backward = self.backward)
             self.calendar.doy = self.calendar.get_doy()
             
+            field_date = self.velocity_fields.field_date(self.calendar.today, backward = self.backward)
+            
             if self.calendar.is_new_year():
                 self.loader.year_df = self.loader.read_spawning_points(self.calendar.today.year)
-            if self.calendar.is_new_month():
+            if self.calendar.is_new_month(field_date): # il mese si decide sulla data dei campi
                 self.velocity_fields.load_month(self.calendar.today, backward = self.backward)
             
             t0 = time.perf_counter() # DEBUG bottleneck
             
-            self.velocity_fields._load_dailyFields_from_month(self.calendar.today)
+            self.velocity_fields._load_dailyFields_from_month(self.calendar.today, backward = self.backward)
             
             t1 = time.perf_counter() # DEBUG bottleneck
             
@@ -137,10 +139,15 @@ class Lagrangian:
             t6 = time.perf_counter() # DEBUG bottleneck
             
             self.storage.update_positions(ode.y)
+            self.storage.age_particles(days=1)
             
             t7 = time.perf_counter() # DEBUG bottleneck
             
-            cut_index = self.storage.evaluate_particles()
+            idx_stranded, idx_lost = self.storage.evaluate_position()
+            idx_aged = self.storage.evaluate_age()
+            self.storage.update_state(idx_stranded, idx_lost, idx_aged)
+            
+            cut_index = self.storage.extract_inactive_idx()
             
             t8 = time.perf_counter() # DEBUG bottleneck
 
@@ -160,11 +167,14 @@ class Lagrangian:
                 f"final={t9-t8:.3f}s"
             )
             
-            if self.calendar.is_last_day(self.calendar.today, backward = self.backward):
+            if self.calendar.is_last_day(self.calendar.today, backward = self.backward) and list(self.storage.final):
                 self.writer.save_particles(year = self.calendar.today.year, particles = self.storage.final)
+                self.storage.clear_final() # senza reset l'anno dopo riscriverebbe anche queste
         
         self.storage.store_final(range(self.storage.xt.size))
-        self.writer.save_particles(year = self.calendar.today.year, particles = self.storage.final)      
+        if list(self.storage.final): # particelle ancora attive alla fine della simulazione
+            self.writer.save_particles(year = self.calendar.today.year, particles = self.storage.final, append = True)
+            self.storage.clear_final()
         
         if self.verbose:
             print(f"Done! time: {time.time()-start:.2f}s")      

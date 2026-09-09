@@ -79,24 +79,25 @@ class LarvaeGenerator(object):
                     unit="day",
                     disable=not self.progress_bar,
                 ):
-                    if x0.size > 0:
-                        parts = self.storage.build_larvae_array(day, x0, y0, z0)
-                        particles_all.append(parts)
+                    current_date = self.calendar.get_current_date(day, backward = self.backward)
                     
-                    current_date = self.calendar.get_current_date(day)
+                    if x0.size > 0:
+                        # come nel ramo sequenziale in colonna 3 va il doy, non il contatore
+                        parts = self.storage.build_larvae_array(current_date.timetuple().tm_yday, x0, y0, z0)
+                        particles_all.append(parts)
                     
                     if self.calendar.is_last_day(current_date, self.backward):
                         if particles_all:
-                            self.export.save_particles_multi(particles_all, current_date, self.calendar.starting_date, self.backward)
+                            self.export.save_particles_multi(particles_all, current_date)
                             particles_all = [] # reset for next batch
                             
             if particles_all: # save any remaining particles
-                self.export.save_particles_multi(particles_all, current_date, self.calendar.starting_date, self.backward)
+                self.export.save_particles_multi(particles_all, current_date)
         else:
             for day in tqdm(
                 self.calendar.sim_time, desc="Generating larvae", unit="day", disable=not self.progress_bar):
                 
-                current_date = self.calendar.get_current_date(day)
+                current_date = self.calendar.get_current_date(day, backward = self.backward)
                 day_of_year = current_date.timetuple().tm_yday
 
                 larvae_today = self.spawning_model.get_daily_spawning(day_of_year, current_date, self.data["total particles"])

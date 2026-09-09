@@ -43,12 +43,12 @@ lagr = Lagrangian(
         "horizontal advection": True,
         "vertical advection": True,
         "diffusion": True,
-        "dvm": True,
+        "dial vertical migration": True,
         "diffusion coefficient": 10.0,
         "diffusion dt": 86400,
         "day depth": 100,
         "night depth": 5,
-        "dvm speed": 1.0,
+        "dvm speed": 10.0, # 1/giorno; 10 -> 85% dell'escursione 5-100 m con 2.1 h di ritardo
     },
 )
 

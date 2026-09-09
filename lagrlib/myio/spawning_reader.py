@@ -29,5 +29,6 @@ class SpawningReader:
         id = data[:,4]
         spawn_year = np.full(data.shape[0], year, dtype=int)
         age = new_age(pld = pld, pld_range = pld_var, n = data.shape[0]) # generate age for each particle based on a truncated normal distribution
+        state = np.zeros(data.shape[0], dtype=int)
         
-        return (xt, yt, zt, doy, age, id, spawn_year) 
+        return (xt, yt, zt, age, doy, id, spawn_year, state) 

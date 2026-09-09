@@ -16,48 +16,45 @@ class Exporter:
         else:
             new_dir = 'LG_'+str(date.today())+'_FW' if self.type_ == 'spawning' else 'PT_'+str(date.today())+'_FW'
 
-        export = path + new_dir if path is not None else self.export + new_dir
-        self.export = export
+        base = path + new_dir if path is not None else self.export + new_dir
 
-        try:
-            os.mkdir(export) # generate destination folder
-        except FileExistsError:
-            if glob(export+'*')[-1][-1] == 'W':
-                export = export+'_00'
-                os.mkdir(export)
-            else:
-                num = int(glob(export+'*')[-1][-2:])
-                export = export+'_%02d' % (num+1,)
-                os.mkdir(export)
+        export = base
+        n = 0
+        while os.path.exists(export): # non sovrascrivere i risultati di run precedenti
+            export = '%s_%02d' % (base, n)
+            n += 1
+
+        os.mkdir(export) # generate destination folder
+        self.export = export # DOPO aver risolto il suffisso, non prima
     
     def save_particles_multi(self, particles, date):
         if self.type_ == 'spawning':
             stack = np.vstack(particles)
             year = date.year
             
-            doy = [date.timetuple().tm_yday] * stack.shape[0] # day of year for all particles
-            
-            stack[:,3] = doy # replace day of spawning with day of year for easier analysis
-            df = pd.DataFrame(stack, columns=['x', 'y', 'z', 'doy', 'id'])
+            df = pd.DataFrame(stack, columns=['x', 'y', 'z', 'doy', 'id', 'state'])
             
             df.to_csv(f'{self.export}/spawning_points_{year}.csv', sep = ',', index=False, float_format='%.3f')
     
-    def save_particles(self, year, particles = None):
+    def save_particles(self, year, particles = None, append = False):
         if self.type_ == 'spawning':
-            df = pd.DataFrame(particles, columns=['x', 'y', 'z', 'doy', 'id'])
+            df = pd.DataFrame(particles, columns=['x', 'y', 'z', 'doy', 'id', 'state'])
             
             df.to_csv(f'{self.export}/spawning_points_{year}.csv', sep = ',', index=False, float_format='%.3f')
         
         elif self.type_ == 'lagrangian':
-            x, y, z, age, doy, pid, spawn_year  = particles
+            x, y, z, age, doy, pid, spawn_year, state = particles
             
             unique_id = spawn_year * 10**9 + doy.astype(int) * 10**6 + pid.astype(int)
 
-            out = np.vstack((x, y, z, age, unique_id)).T
+            out = np.vstack((x, y, z, age, unique_id, state)).T
 
-            fmt = ["%.6f", "%.6f", "%.6f", "%d", "%d"]
-            np.savetxt(f"{self.export}/final_{year:04d}.csv", out, fmt=fmt, delimiter=",")
-            self.final = np.array([])
+            fmt = ["%.6f", "%.6f", "%.6f", "%d", "%d", "%d"]
+            
+            path = f"{self.export}/final_{year:04d}.csv"
+            mode = "ab" if (append and os.path.exists(path)) else "wb"
+            with open(path, mode) as f: # in append vanno le particelle ancora attive a fine run
+                np.savetxt(f, out, fmt=fmt, delimiter=",")
     
     
         

@@ -36,6 +36,11 @@ class FieldsManager(object):
         self.interp_V = None
         self.interp_W = None
     
+    def field_date(self, today, backward = False):
+        # in backward il giorno t usa i campi del giorno precedente: mese e giorno
+        # vanno scelti su questa data, non su today
+        return today - timedelta(days=1) if backward else today
+    
     def load_month(self, today, backward = False):
         U, V, W, X, Y, Z = self.read_month(today, backward)
         if self.X_grid is None:
@@ -58,7 +63,7 @@ class FieldsManager(object):
         
         path = self.path
         
-        date = today - timedelta(days=1) if backward else today
+        date = self.field_date(today, backward)
         year = date.year
         month = date.month
         
@@ -91,9 +96,9 @@ class FieldsManager(object):
                 V = np.array(ds_vo.vo.values, dtype=np.float32).transpose(0,3,2,1)
 
                 if self.X_grid is None:
-                    X = np.array(ds.longitude.values, dtype=np.float32)
-                    Y = np.array(ds.latitude.values, dtype=np.float32)
-                    Z = np.array(ds.depth.values, dtype=np.float32)
+                    X = np.array(ds_uo.longitude.values, dtype=np.float32)
+                    Y = np.array(ds_uo.latitude.values, dtype=np.float32)
+                    Z = np.array(ds_uo.depth.values, dtype=np.float32)
             
             case "CMCC":
                 path_vozocrtx = sorted(glob(f"{path}medsea-cmip5-projections-physics-RCP{self.RCP:02d}-{year:04d}-{month:02d}-*/vozocrtx_medsea-cmip5-projections-physics_RCP{self.RCP:2d}_grid_U.nc"))
@@ -141,7 +146,7 @@ class FieldsManager(object):
         D_min, D_max = self.D_min, self.D_max
 
         path = self.path
-        date = today - timedelta(days=1) if backward else today
+        date = self.field_date(today, backward)
         year = date.year
         month = date.month
         day = date.day
@@ -177,9 +182,9 @@ class FieldsManager(object):
             V = np.array(ds_vo.vo.values, dtype=np.float32)[day-1].transpose(2,1,0)
 
             if self.X_grid is None:
-                X = np.array(ds.longitude.values, dtype=np.float32)
-                Y = np.array(ds.latitude.values, dtype=np.float32)
-                Z = np.array(ds.depth.values, dtype=np.float32)
+                X = np.array(ds_uo.longitude.values, dtype=np.float32)
+                Y = np.array(ds_uo.latitude.values, dtype=np.float32)
+                Z = np.array(ds_uo.depth.values, dtype=np.float32)
 
         elif self.model == 'CMCC':
             path_vozocrtx = glob(f"{path}medsea-cmip5-projections-physics-RCP{self.RCP:02d}-{year:04d}-{month:02d}-{day:02d}/vozocrtx_medsea-cmip5-projections-physics_RCP{self.RCP:2d}_grid_U.nc")[0]
@@ -253,9 +258,9 @@ class FieldsManager(object):
                 V = np.array(ds.vo.values, dtype=np.float32)[0].transpose(2,1,0)
 
                 if self.X_grid is None:
-                    X = np.array(ds.longitude.values, dtype=np.float32)
-                    Y = np.array(ds.latitude.values, dtype=np.float32)
-                    Z = np.array(ds.depth.values, dtype=np.float32)
+                    X = np.array(ds_uo.longitude.values, dtype=np.float32)
+                    Y = np.array(ds_uo.latitude.values, dtype=np.float32)
+                    Z = np.array(ds_uo.depth.values, dtype=np.float32)
             
             case "CMCC":
                 file_vozocrtx = sorted(glob(f"{path}*/vozocrtx_medsea-cmip5-projections-physics_RCP*_grid_U.nc"))[0]
@@ -276,8 +281,8 @@ class FieldsManager(object):
             
         return U, V, W, X, Y, Z
         
-    def _load_dailyFields_from_month(self, today):
-        day = today.day
+    def _load_dailyFields_from_month(self, today, backward = False):
+        day = self.field_date(today, backward).day
         self.U = self.U_month[day-1]
         self.V = self.V_month[day-1]
         if (self.vertical_adv and self.model == 'CMCC'):
