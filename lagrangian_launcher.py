@@ -21,7 +21,7 @@ data = {
     "field path" :  "data/currents/",
     "check field path" : "/data01/mediterraneo/2020/05/",
     "spawning export path": "results/larvae_gen/",
-    "spawning points path": "results/larvae_gen/LG_2026-06-04_FW/",
+    "spawning points path": "results/larvae_gen/LG_2026-09-15_FW/",
     "lagrangian export path": "results/lagrangian/",
 }
 

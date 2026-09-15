@@ -47,14 +47,20 @@ class Exporter:
             
             unique_id = spawn_year * 10**9 + doy.astype(int) * 10**6 + pid.astype(int)
 
-            out = np.vstack((x, y, z, age, unique_id, state)).T
+            df = pd.DataFrame({
+                'x': x,
+                'y': y,
+                'z': z,
+                'age': np.asarray(age).astype(int),
+                'id': unique_id.astype(np.int64),
+                'state': np.asarray(state).astype(int),
+            })
 
-            fmt = ["%.6f", "%.6f", "%.6f", "%d", "%d", "%d"]
-            
             path = f"{self.export}/final_{year:04d}.csv"
-            mode = "ab" if (append and os.path.exists(path)) else "wb"
-            with open(path, mode) as f: # in append vanno le particelle ancora attive a fine run
-                np.savetxt(f, out, fmt=fmt, delimiter=",")
+            resume = append and os.path.exists(path) # in append vanno le particelle ancora attive a fine run
+
+            df.to_csv(path, sep = ',', index=False, float_format='%.3f',
+                      mode = 'a' if resume else 'w', header = not resume)
     
     
         
