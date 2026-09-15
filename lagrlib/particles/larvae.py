@@ -11,7 +11,7 @@ class ParticleState:
     y: np.ndarray
     z: np.ndarray
     age: np.ndarray = None
-    state: np.ndarray = None # stato di ogni particella: 0 attiva, 1 spiaggiata, 2 PLD raggiunto, 3 persa (fuori dominio)
+    state: np.ndarray = None # stato di ogni particella: 0 attiva, 1 PLD raggiunto, 2 spiaggiata, 3 persa (fuori dominio)
 
 class ParticleManager:
     def __init__(self):       
@@ -110,8 +110,8 @@ class LarvaeManager(ParticleManager):
     def update_state(self, idx_stranded, idx_lost, idx_aged):
         # l'ordine e' la precedenza: se una particella ricade in piu' condizioni
         # nello stesso giorno vince l'ultima assegnazione
-        self.state[idx_stranded] = 1
-        self.state[idx_aged] = 2
+        self.state[idx_aged] = 1
+        self.state[idx_stranded] = 2
         self.state[idx_lost] = 3
     
     def evaluate_age(self):
